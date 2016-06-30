@@ -1,0 +1,37 @@
+---
+
+- name: Test Swap playbook
+  hosts: all
+
+  roles:
+    - role: sansible.swap
+      swap:
+        block_size: "{{ (1024 * 1024) }}"
+        blocks_count: 1024
+        sysctl:
+          - name: vm.swappiness
+            value: 61
+          - name: vm.vfs_cache_pressure
+            value: 99
+
+  post_tasks:
+    - name: Assert swap file size
+      stat:
+        path: "{{ swap.file }}"
+      register: assert_swap
+      failed_when: assert_swap.stat.size != 1024 * 1024 * swap.blocks_count
+      tags:
+        - assert
+
+    - name: Assert sysctl config
+      become: yes
+      command: "sysctl -n {{ item.name }}"
+      register: sysctl_result
+      failed_when: "'{{ item.value }}' != sysctl_result.stdout"
+      with_items:
+        - name: vm.swappiness
+          value: 61
+        - name: vm.vfs_cache_pressure
+          value: 99
+      tags:
+        - assert

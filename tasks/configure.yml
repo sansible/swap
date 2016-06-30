@@ -1,0 +1,10 @@
+---
+
+- name: Configure vm.swappiness
+  become: yes
+  shell: "if [ \"{{ item.value }}\" -ne `sysctl -n {{ item.name }}` ]; then sysctl -n -b {{ item.name }}={{ item.value }}; else echo 'no changes'; fi"
+  register: sysctl_result
+  changed_when: "sysctl_result.stdout != 'no changes'"
+  notify:
+    - reload sysctl
+  with_items: "{{ swap.sysctl }}"

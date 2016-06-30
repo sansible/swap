@@ -1,0 +1,11 @@
+---
+
+- name: add swap
+  include: build.yml
+  tags:
+    - build
+
+- name: configure swap(iness)
+  include: configure.yml
+  tags:
+    - configure

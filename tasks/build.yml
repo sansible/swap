@@ -1,0 +1,32 @@
+---
+
+- name: Create swap file
+  become: yes
+  command: "dd if=/dev/zero of={{ swap.file }} bs={{ swap.block_size }} count={{ swap.blocks_count }}"
+  args:
+    creates: "{{ swap.file }}"
+  register: swapfile
+
+- name: Set swap file permissions
+  become: yes
+  file:
+    path: "{{ swap.file }}"
+    mode: 600
+
+- name: Create swapfile
+  become: yes
+  command: "mkswap {{ swap.file }}"
+  register: create_swapfile
+  when: swapfile.changed
+
+- name: Enable swapfile
+  become: yes
+  command: "swapon {{ swap.file }}"
+  when: swapfile.changed
+
+- name: Add swapfile to /etc/fstab
+  become: yes
+  lineinfile:
+    dest: /etc/fstab
+    line: "{{ swap.file }}   none    swap    sw    0   0"
+    state: present

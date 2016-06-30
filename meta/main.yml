@@ -1,0 +1,17 @@
+---
+
+galaxy_info:
+  author: Wojtek Oledzki
+  description: Adds swap memmory and configures swappiness
+  github_branch: master
+  license: MIT
+  min_ansible_version: 1.9
+  platforms:
+    - name: Ubuntu
+      versions:
+        - precise
+        - trusty
+  galaxy_tags:
+    - system
+
+dependencies: [ ]
